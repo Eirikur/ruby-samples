@@ -25,9 +25,6 @@ attr_reader :symbol, :volume, :price, :time, :open_orders, :net_change, :percent
 
 end # class Quote
 
-#myQuote = Quote.new(123456,199.99,"12:30",666,1.98,40,22)
-
-
 class Ticker
   include Enumerable
   attr_reader :velocity, :quotes, :symb, :up, :down, :rank
@@ -45,41 +42,31 @@ class Ticker
   def << (theQuote)
     if @quotes.size != 0 # if this is not the first entry
       if @quotes.last.time != theQuote.time # if the timestamp is new
-	delta_minutes = (theQuote.time - self.quotes.first.time) / 60
-	delta_dollars = ((theQuote.price - self.quotes.first.price)*100).floor.to_f/100
-	@velocity =  (delta_dollars / delta_minutes)
+    	delta_minutes = (theQuote.time - self.quotes.first.time) / 60
+	    delta_dollars = ((theQuote.price - self.quotes.first.price)*100).floor.to_f/100
+	    @velocity =  (delta_dollars / delta_minutes)
       end # new timestamp
       @up += 1 if @quotes.last.rank > theQuote.rank
       @down += 1 if @quotes.last.rank < theQuote.rank
-      # just for now... debugging, monitoring.
-#      if @quotes.last.rank != theQuote.rank
-#	puts "#{@symb} #{@quotes.last.rank} -> #{theQuote.rank} Up: #{@up} Down: #{@down} %: #{theQuote.percent_change}"
-#      end # if rank not equal
     end # this is not the first entry
     @quotes << theQuote
     @rank = theQuote.rank
   end  # <<
 
+  def lister # Just for debugging
+    puts self
+    self.quotes.each { |aQuote| puts aQuote.to_s }
+  end
 
+  def to_s
+    "#{symb}" # just return the symbol
+  end # to_s
 
-
-def lister # Just for debugging
-  puts self
-  self.quotes.each { |aQuote| puts aQuote.to_s }
-end
-
-
-def to_s
-  "#{symb}" # just return the symbol
-end # to_s
-
-
-def size
-  @quotes.length # Our size is our number
-end
+  def size
+    @quotes.length # Our size is our number
+  end
 
 end # Class Ticker
-
 
 
 class TickerList
@@ -111,15 +98,13 @@ attr_reader :symbol_list
 
 
   def restore
-#    begin
+    #    begin
     @symbol_list = []
     File.open(@file_name) do |f|
       @symbol_list = Marshal.load(f)
     end
   rescue SystemCallError
     puts "No database found, initializing..."
-#  else
-#    puts "Database loaded."
   end # TickerList.restore
 
   def lister
@@ -160,10 +145,6 @@ def continue(theQuote)
 #if theQuote.price - @quotes.last.price <= 0
 end
 
-
 end # class Trend
-
-
-
 
 end # Module Toplist_Classes
